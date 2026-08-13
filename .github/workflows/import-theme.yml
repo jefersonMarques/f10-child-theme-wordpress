@@ -1,0 +1,35 @@
+name: Import F10 child theme
+
+on:
+  push:
+    paths:
+      - IMPORT_READY
+
+permissions:
+  contents: write
+
+jobs:
+  import-theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rebuild and extract uploaded theme
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/f10-theme
+          cat .import/chunk-* | base64 --decode > /tmp/f10-child.zip
+          unzip -q /tmp/f10-child.zip -d /tmp/f10-theme
+          rsync -a --delete --exclude='.git/' /tmp/f10-theme/ ./
+
+      - name: Commit imported theme
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Import F10 child theme from ZIP"
+          git push
