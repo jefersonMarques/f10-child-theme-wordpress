@@ -20,8 +20,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/f10-theme
-          cat .import/chunk-* | base64 --decode > /tmp/f10-child.zip
-          unzip -q /tmp/f10-child.zip -d /tmp/f10-theme
+          cat .import/chunk-* | base64 --decode > /tmp/f10-child.tar.xz
+          tar -xJf /tmp/f10-child.tar.xz -C /tmp/f10-theme
           rsync -a --delete --exclude='.git/' /tmp/f10-theme/ ./
 
       - name: Commit imported theme
